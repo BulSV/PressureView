@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/elisat.png</file>
+        <file>Resources/PressureView.png</file>
+    </qresource>
+</RCC>
