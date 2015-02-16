@@ -10,10 +10,10 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
 #if defined (Q_OS_UNIX)
-    app.setWindowIcon(QIcon(":/Resources/RRMControl.png"));
+    app.setWindowIcon(QIcon(":/Resources/PressureView.png"));
 #endif
     Dialog fDialog;
-    fDialog.setWindowTitle(QString::fromUtf8("RRM Control"));
+    fDialog.setWindowTitle(QString::fromUtf8("Pressure View"));
     fDialog.show();
 
     return app.exec();
