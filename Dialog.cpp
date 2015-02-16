@@ -12,7 +12,10 @@
 #define BYTESLENTH 8
 
 #define FORMAT 'f'
-#define PRECISION 2
+#define PRECISION 3
+
+#define DIGIT_RANGE_VOLT 7
+#define DIGIT_RANGE_PASC 7
 
 #define BLINKTIMETX 200 // ms
 #define BLINKTIMERX 500 // ms
@@ -126,8 +129,8 @@ Dialog::Dialog(QWidget *parent) :
         lcd->setFrameStyle(QFrame::NoFrame);
     }
 
-    lcdVolt->setDigitCount(6);
-    lcdPascal->setDigitCount(6);
+    lcdVolt->setDigitCount(DIGIT_RANGE_VOLT);
+    lcdPascal->setDigitCount(DIGIT_RANGE_PASC);
 
     connect(bPortStart, SIGNAL(clicked()), this, SLOT(openPort()));
     connect(bPortStop, SIGNAL(clicked()), this, SLOT(closePort()));
@@ -221,9 +224,15 @@ void Dialog::received(bool isReceived)
 
         QList<QString> strKeysList = itsProtocol->getReadedData().keys();
         for(int i = 0; i < itsProtocol->getReadedData().size(); ++i) {
-            if(strKeysList.at(i) == QString(DATA_VOLT)
-                    || strKeysList.at(i) == QString(DATA_PASCAL)) {
-                itsDataList.append(itsProtocol->getReadedData().value(strKeysList.at(i)));
+            if(strKeysList.at(i) == QString(DATA_VOLT))
+            {
+                itsDataList.append(addTrailingZeros(QString::number(
+                                                        mVtoV(itsProtocol->getReadedData().value(strKeysList.at(i)).toInt())),
+                                                    PRECISION));
+            } else if(strKeysList.at(i) == QString(DATA_PASCAL)) {
+                itsDataList.append(addTrailingZeros(QString::number(
+                                                        mVtoV(itsProtocol->getReadedData().value(strKeysList.at(i)).toInt())),
+                                                    PRECISION));
 #ifdef DEBUG
                 qDebug() << "QString::number(DATA):" << itsProtocol->getReadedData().value(strKeysList.at(i));
 #endif
@@ -232,7 +241,7 @@ void Dialog::received(bool isReceived)
     }
 }
 
-QString &Dialog::addTrailingZeros(QString &str, int prec)
+QString Dialog::addTrailingZeros(QString str, int prec)
 {
     if(str.isEmpty() || prec < 1) { // if prec == 0 then it's no sense
         return str;
@@ -251,6 +260,30 @@ QString &Dialog::addTrailingZeros(QString &str, int prec)
     }
 
     return str;
+}
+
+float Dialog::mVtoV(const int &mV)
+{
+#ifdef DEBUG
+    qDebug() << "mV:" << mV;
+#endif
+    if(mV >= 0) {
+        return (mV*1000);
+    } else {
+        return -1;
+    }
+}
+
+float Dialog::PaTokPa(const int &Pa)
+{
+#ifdef DEBUG
+    qDebug() << "Pa:" << Pa;
+#endif
+    if(Pa >= 0) {
+        return (Pa*0.001);
+    } else {
+        return -1;
+    }
 }
 
 void Dialog::colorIsRx()

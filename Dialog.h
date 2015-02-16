@@ -48,10 +48,11 @@ class Dialog : public QDialog
 
     QStringList itsDataList;
 
-    // цвет индикации температуры >0 & <=0
-    void setColorLCD(QLCDNumber *lcd, bool isHeat);
     // добавляет завершающие нули
-    QString &addTrailingZeros(QString &str, int prec);
+    QString addTrailingZeros(QString str, int prec);
+
+    float mVtoV(const int &mV);
+    float PaTokPa(const int &Pa);
 
     QStatusBar *itsStatusBar;
 

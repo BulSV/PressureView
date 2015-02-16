@@ -8,9 +8,6 @@
 #define STOPBYTE 0xAA
 #define BYTESLENTH 8
 
-#define FORMAT 'f'
-#define PRECISION 2
-
 #define DATA_VOLT "VOLT"
 #define DATA_PASCAL "PASC"
 
@@ -45,8 +42,8 @@ void PVProtocol::readData(bool isReaded)
         }
 #endif
         itsReadData.insert(QString(DATA_VOLT),
-                           QString::number(wordToInt(ba.mid(1, 2)), FORMAT, PRECISION));
-        itsReadData.insert(QString(DATA_PASCAL), QString::number(wordToInt(ba.mid(3, 4)), FORMAT, PRECISION));
+                           QString::number(wordToInt(ba.mid(1, 2))));
+        itsReadData.insert(QString(DATA_PASCAL), QString::number(wordToInt(ba.mid(3, 4))));
         emit DataIsReaded(true);
     } else {
         emit DataIsReaded(false);
