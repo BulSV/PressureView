@@ -243,7 +243,6 @@ void Dialog::received(bool isReceived)
 
 QString Dialog::addTrailingZeros(QString str, int prec)
 {
-    qDebug() << "QString Dialog::addTrailingZeros(" << str << "," << prec << ")";
     if(str.isEmpty() || prec < 1) { // if prec == 0 then it's no sense
         return str;
     }
@@ -251,7 +250,6 @@ QString Dialog::addTrailingZeros(QString str, int prec)
     int pointIndex = str.indexOf(".");
     if(pointIndex == -1) {
         str.append(".");
-        qDebug() << "QString Dialog::addTrailingZeros(): " << str;
         pointIndex = str.size() - 1;
     }
 
@@ -259,11 +257,9 @@ QString Dialog::addTrailingZeros(QString str, int prec)
         int size = str.size();
         for(int i = 0; i < prec - (size - 1 - pointIndex); ++i) {
             str.append("0");
-            qDebug() << "QString Dialog::addTrailingZeros(): " << str;
         }
     }
 
-    qDebug() << "FINAL: QString Dialog::addTrailingZeros(): " << str;
     return str;
 }
 
