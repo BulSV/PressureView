@@ -43,7 +43,7 @@ void PVProtocol::readData(bool isReaded)
 #endif
         itsReadData.insert(QString(DATA_VOLT),
                            QString::number(wordToInt(ba.mid(1, 2))));
-        itsReadData.insert(QString(DATA_PASCAL), QString::number(wordToInt(ba.mid(3, 4))));
+        itsReadData.insert(QString(DATA_PASCAL), QString::number(byteArrayToInt(ba.mid(3, 4))));
         emit DataIsReaded(true);
     } else {
         emit DataIsReaded(false);
@@ -83,4 +83,23 @@ int PVProtocol::wordToInt(QByteArray ba)
         temp += ba[1]; // младший байт
 
     return temp;
+}
+
+int PVProtocol::byteArrayToInt(const QByteArray &ba)
+{
+    int result = 0;
+
+    if(ba.size() > sizeof(int)) {
+        return -1;
+    }
+
+    for(int i = 0; i < ba.size(); ++i) {
+//        if(i > 0) {
+            result += (ba.at(i) << (ba.size() - 1 - i)*8) & (0xFF << (ba.size() - 1 - i)*8);
+//        } else {
+//            result += 0x100 << (ba.size() - 1 - i)*8 + (ba.at(i) << (ba.size() - 1 - i)*8) & (0xFF << (ba.size() - 1 - i)*8);
+//        }
+    }
+
+    return result;
 }
