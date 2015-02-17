@@ -23,8 +23,6 @@ private:
 
     QMultiMap<QString, QString> itsReadData;
 
-    // преобразует word в byte
-    int wordToInt(QByteArray ba);
     // Transform byte array to int
     int byteArrayToInt(const QByteArray &ba);
 };
