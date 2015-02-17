@@ -231,7 +231,7 @@ void Dialog::received(bool isReceived)
                                                     PRECISION));
             } else if(strKeysList.at(i) == QString(DATA_PASCAL)) {
                 itsDataList.append(addTrailingZeros(QString::number(
-                                                        mVtoV(itsProtocol->getReadedData().value(strKeysList.at(i)).toInt())),
+                                                        PaTokPa(itsProtocol->getReadedData().value(strKeysList.at(i)).toInt())),
                                                     PRECISION));
 #ifdef DEBUG
                 qDebug() << "QString::number(DATA):" << itsProtocol->getReadedData().value(strKeysList.at(i));
@@ -273,7 +273,7 @@ float Dialog::mVtoV(const int &mV)
     qDebug() << "mV:" << mV;
 #endif
     if(mV >= 0) {
-        return (mV*1000);
+        return (mV*0.001);
     } else {
         return -1;
     }
@@ -311,7 +311,7 @@ void Dialog::display()
     itsTimeToDisplay->stop();
 
     QList<QLCDNumber*> list;
-    list << lcdPascal << lcdVolt;
+    list << lcdVolt << lcdPascal;
     QString tempStr;
 #ifdef DEBUG
         qDebug() << "itsDataList.size() =" << itsDataList.size();
