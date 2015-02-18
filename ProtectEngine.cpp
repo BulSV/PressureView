@@ -23,7 +23,7 @@ void ProtectEngine::protect()
     if(!isValidLicense()) {
         QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");        
         m_LicenseFile->close();
-        writeLastTimeRun();
+//        writeLastTimeRun();
         throw "Renew license!";
     } else {
         m_LicenseFile->close();
@@ -50,28 +50,34 @@ bool ProtectEngine::isValidLicense()
         QDate date;
 
         stream >> date;
+#ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "Ошибка чтения файла" << stream.status();
         }
+#endif
         int startTimeDay = date.day();
         int startTimeMonth = date.month();
         int startTimeYear = date.year();
 
         stream >> date;
+#ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "Ошибка чтения файла" << stream.status();
         }
+#endif
         int endTimeDay = date.day();
         int endTimeMonth = date.month();
         int endTimeYear = date.year();
 
         stream >> date;
+#ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "Ошибка чтения файла" << stream.status();
         }
+#endif
         int lastTimeDay = date.day();
         int lastTimeMonth = date.month();
         int lastTimeYear = date.year();
@@ -90,18 +96,24 @@ bool ProtectEngine::isValidLicense()
         qDebug() << lastTimeMonth;
         qDebug() << lastTimeYear;
 #endif
-        if(startTimeDay > m_CurrentDate->day()
-                && startTimeMonth > m_CurrentDate->month()
-                && startTimeYear > m_CurrentDate->year()
-                && endTimeDay < m_CurrentDate->day()
-                && endTimeMonth < m_CurrentDate->month()
-                && endTimeYear < m_CurrentDate->year()
-                && lastTimeDay < m_CurrentDate->day()
-                && lastTimeMonth < m_CurrentDate->month()
-                && lastTimeYear < m_CurrentDate->year()) {
+        if(startTimeDay <= m_CurrentDate->day()
+                && startTimeMonth <= m_CurrentDate->month()
+                && startTimeYear <= m_CurrentDate->year()
+                && endTimeDay >= m_CurrentDate->day()
+                && endTimeMonth >= m_CurrentDate->month()
+                && endTimeYear >= m_CurrentDate->year()
+                && lastTimeDay <= m_CurrentDate->day()
+                && lastTimeMonth <= m_CurrentDate->month()
+                && lastTimeYear <= m_CurrentDate->year()) {
+#ifdef DEBUG
+            qDebug() << "TRUE";
+#endif
             return true;
         }
     }
+#ifdef DEBUG
+            qDebug() << "FALSE";
+#endif
     return false;
 }
 
