@@ -53,7 +53,7 @@ bool ProtectEngine::isValidLicense()
 #ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
-            qDebug() << "Ошибка чтения файла" << stream.status();
+            qDebug() << "start: Ошибка чтения файла" << stream.status();
         }
 #endif
         int startTimeDay = date.day();
@@ -64,7 +64,7 @@ bool ProtectEngine::isValidLicense()
 #ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
-            qDebug() << "Ошибка чтения файла" << stream.status();
+            qDebug() << "end: Ошибка чтения файла" << stream.status();
         }
 #endif
         int endTimeDay = date.day();
@@ -75,7 +75,7 @@ bool ProtectEngine::isValidLicense()
 #ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
-            qDebug() << "Ошибка чтения файла" << stream.status();
+            qDebug() << "last: Ошибка чтения файла" << stream.status();
         }
 #endif
         int lastTimeDay = date.day();
@@ -122,14 +122,13 @@ void ProtectEngine::writeLastTimeRun()
 #ifdef DEBUG
         qDebug() << "void ProtectEngine::writeLastTimeRun()";
 #endif
-    if(m_LicenseFile->open(QFile::WriteOnly | QFile::Truncate)) {
+    if(m_LicenseFile->open(QFile::ReadWrite)) {
         QDataStream stream(m_LicenseFile);
         stream.setVersion(QDataStream::Qt_5_2);
-        QDate date(2015, 2, 17);
-        stream << date;
-        date.setDate(2015, 2, 19);
-        stream << date;
+
+        stream.device()->seek(static_cast<qint64>(2*sizeof(QDate)));
         stream << *m_CurrentDate;
+
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "Ошибка записи файла" << stream.status();
