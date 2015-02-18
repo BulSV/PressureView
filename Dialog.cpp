@@ -155,6 +155,11 @@ Dialog::~Dialog()
     itsPort->close();
 }
 
+void Dialog::startProgram()
+{
+    show();
+}
+
 void Dialog::openPort()
 {
     itsPort->close();

@@ -40,13 +40,16 @@ HEADERS += \
     ComPort.h \
     Dialog.h \
     IProtocol.h \
-    PVProtocol.h
+    PVProtocol.h \
+    IProtectedProgram.h \
+    ProtectEngine.h
 
 SOURCES += \
     ComPort.cpp \
     Dialog.cpp \
     main.cpp \
-    PVProtocol.cpp
+    PVProtocol.cpp \
+    ProtectEngine.cpp
 
 RESOURCES += \
     PressureView.qrc

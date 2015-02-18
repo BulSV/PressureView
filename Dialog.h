@@ -18,8 +18,9 @@
 #include "ComPort.h"
 #include "IProtocol.h"
 #include "PVProtocol.h"
+#include "IProtectedProgram.h"
 
-class Dialog : public QDialog
+class Dialog : public QDialog, public IProtectedProgram
 {
     Q_OBJECT
 
@@ -72,6 +73,7 @@ private slots:
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
+    virtual void startProgram();
 };
 
 #endif // DIALOG_H
