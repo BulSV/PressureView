@@ -1,5 +1,5 @@
 #include <QMessageBox>
-#include <QByteArray>
+#include <QDataStream>
 #include "ProtectEngine.h"
 
 #ifdef DEBUG
@@ -10,6 +10,7 @@ ProtectEngine::ProtectEngine(IProtectedProgram *protectedProgram,
                              const QString &licenseFileName)
     : m_ProtectedProgram(protectedProgram)
     , m_LicenseFile(new QFile(licenseFileName))
+    , m_CurrentDate(new QDate)
 {
 }
 
@@ -18,11 +19,11 @@ ProtectEngine::~ProtectEngine()
 }
 
 void ProtectEngine::protect()
-{
-    isValidLicense();
-    if(!m_LicenseFile->open(QFile::ReadOnly) && !isValidLicense()) {
-        QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");
+{        
+    if(!isValidLicense()) {
+        QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");        
         m_LicenseFile->close();
+        writeLastTimeRun();
         throw "Renew license!";
     } else {
         m_LicenseFile->close();
@@ -34,59 +35,74 @@ void ProtectEngine::protect()
 
 bool ProtectEngine::isValidLicense()
 {
-    m_CurrentDate = m_CurrentDate.currentDate();
+    if(m_LicenseFile->open(QFile::ReadOnly)) {
+        m_CurrentDate->setDate(QDate::currentDate().year(),
+                               QDate::currentDate().month(),
+                               QDate::currentDate().day());
 #ifdef DEBUG
-    qDebug() << "bool ProtectEngine::isValidLicense()";
-    qDebug() << m_CurrentDate.day();
-    qDebug() << m_CurrentDate.month();
-    qDebug() << m_CurrentDate.year();
+        qDebug() << "CURRENT: bool ProtectEngine::isValidLicense()";
+        qDebug() << m_CurrentDate->day();
+        qDebug() << m_CurrentDate->month();
+        qDebug() << m_CurrentDate->year();
 #endif
-//    int startTimeDay = m_LicenseFile->read(1).toInt();
-//    int startTimeMonth = m_LicenseFile->read(1).toInt();
-//    int startTimeYear = m_LicenseFile->read(2).toInt();
+        QDataStream stream(m_LicenseFile);
+        stream.setVersion(QDataStream::Qt_5_2);
+        QDate date;
 
-//    int endTimeDay = m_LicenseFile->read(1).toInt();
-//    int endTimeMonth = m_LicenseFile->read(1).toInt();
-//    int endTimeYear = m_LicenseFile->read(2).toInt();
+        stream >> date;
+        if(stream.status() != QDataStream::Ok)
+        {
+            qDebug() << "Ошибка чтения файла" << stream.status();
+        }
+        int startTimeDay = date.day();
+        int startTimeMonth = date.month();
+        int startTimeYear = date.year();
 
-//    int lastTimeDay = m_LicenseFile->read(1).toInt();
-//    int lastTimeMonth = m_LicenseFile->read(1).toInt();
-//    int lastTimeYear = m_LicenseFile->read(2).toInt();
+        stream >> date;
+        if(stream.status() != QDataStream::Ok)
+        {
+            qDebug() << "Ошибка чтения файла" << stream.status();
+        }
+        int endTimeDay = date.day();
+        int endTimeMonth = date.month();
+        int endTimeYear = date.year();
 
-    QVariant v = m_LicenseFile->read(sizeof(QDate));
-    int startTimeDay = v.toDate().day();
-    int startTimeMonth = v.toDate().month();
-    int startTimeYear = v.toDate().year();
-
-    v = m_LicenseFile->read(sizeof(QDate));
-    int endTimeDay = v.toDate().day();
-    int endTimeMonth = v.toDate().month();
-    int endTimeYear = v.toDate().year();
-
-    v = m_LicenseFile->read(sizeof(QDate));
-    int lastTimeDay = v.toDate().day();
-    int lastTimeMonth = v.toDate().month();
-    int lastTimeYear = v.toDate().year();
-
+        stream >> date;
+        if(stream.status() != QDataStream::Ok)
+        {
+            qDebug() << "Ошибка чтения файла" << stream.status();
+        }
+        int lastTimeDay = date.day();
+        int lastTimeMonth = date.month();
+        int lastTimeYear = date.year();
 #ifdef DEBUG
-    qDebug() << "bool ProtectEngine::isValidLicense()";
-    qDebug() << startTimeDay;
-    qDebug() << startTimeMonth;
-    qDebug() << startTimeYear;
+        qDebug() << "READ: bool ProtectEngine::isValidLicense()";
+        qDebug() << "Start Time:";
+        qDebug() << startTimeDay;
+        qDebug() << startTimeMonth;
+        qDebug() << startTimeYear;
+        qDebug() << "End Time:";
+        qDebug() << endTimeDay;
+        qDebug() << endTimeMonth;
+        qDebug() << endTimeYear;
+        qDebug() << "Last Time:";
+        qDebug() << lastTimeDay;
+        qDebug() << lastTimeMonth;
+        qDebug() << lastTimeYear;
 #endif
-    if(startTimeDay > m_CurrentDate.day()
-            && startTimeMonth > m_CurrentDate.month()
-            && startTimeYear > m_CurrentDate.year()
-            && endTimeDay < m_CurrentDate.day()
-            && endTimeMonth < m_CurrentDate.month()
-            && endTimeYear < m_CurrentDate.year()
-            && lastTimeDay < m_CurrentDate.day()
-            && lastTimeMonth < m_CurrentDate.month()
-            && lastTimeYear < m_CurrentDate.year()) {
-        return true;
-    } else {
-        return false;
+        if(startTimeDay > m_CurrentDate->day()
+                && startTimeMonth > m_CurrentDate->month()
+                && startTimeYear > m_CurrentDate->year()
+                && endTimeDay < m_CurrentDate->day()
+                && endTimeMonth < m_CurrentDate->month()
+                && endTimeYear < m_CurrentDate->year()
+                && lastTimeDay < m_CurrentDate->day()
+                && lastTimeMonth < m_CurrentDate->month()
+                && lastTimeYear < m_CurrentDate->year()) {
+            return true;
+        }
     }
+    return false;
 }
 
 void ProtectEngine::writeLastTimeRun()
@@ -94,12 +110,18 @@ void ProtectEngine::writeLastTimeRun()
 #ifdef DEBUG
         qDebug() << "void ProtectEngine::writeLastTimeRun()";
 #endif
-    if(m_LicenseFile->open(QFile::WriteOnly)) {
-        QVariant v(m_CurrentDate);
-         m_LicenseFile->write(v.toString().toStdString().data(), sizeof(QDate));
-//        m_LicenseFile->write(reinterpret_cast<const char*>(m_CurrentDate/*.day()*/), sizeof(QDate));
-//        m_LicenseFile->write(static_cast<const char*>(m_CurrentDate.month()), 1);
-//        m_LicenseFile->write(reinterpret_cast<char*>(m_CurrentDate.year()), 2);
+    if(m_LicenseFile->open(QFile::WriteOnly | QFile::Truncate)) {
+        QDataStream stream(m_LicenseFile);
+        stream.setVersion(QDataStream::Qt_5_2);
+        QDate date(2015, 2, 17);
+        stream << date;
+        date.setDate(2015, 2, 19);
+        stream << date;
+        stream << *m_CurrentDate;
+        if(stream.status() != QDataStream::Ok)
+        {
+            qDebug() << "Ошибка записи файла" << stream.status();
+        }
 #ifdef DEBUG
         qDebug() << "void ProtectEngine::writeLastTimeRun(): file is opened!)))";
 #endif

@@ -15,7 +15,7 @@ public:
 private:
     IProtectedProgram *m_ProtectedProgram;
     QFile *m_LicenseFile;
-    QDate m_CurrentDate;
+    QDate *m_CurrentDate;
 
     bool isValidLicense();
     void writeLastTimeRun();

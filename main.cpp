@@ -13,10 +13,10 @@ int main(int argc, char **argv)
 #if defined (Q_OS_UNIX)
     app.setWindowIcon(QIcon(":/Resources/PressureView.png"));
 #endif
-    Dialog *fDialog = new Dialog();
-    fDialog->setWindowTitle(QString::fromUtf8("Pressure View"));
-//    fDialog.show();
-    ProtectEngine *pe = new ProtectEngine(fDialog, "ProdKey.bin");
+    Dialog *dialog = new Dialog();
+    dialog->setWindowTitle(QString::fromUtf8("Pressure View"));
+//    fDialog->show();
+    ProtectEngine *pe = new ProtectEngine(dialog, "ProdKey.bin");
     pe->protect();
 
     return app.exec();
