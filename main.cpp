@@ -15,8 +15,7 @@ int main(int argc, char **argv)
 #endif
     Dialog *dialog = new Dialog();
     dialog->setWindowTitle(QString::fromUtf8("Pressure View"));
-//    fDialog->show();
-    ProtectEngine *pe = new ProtectEngine(dialog, "ProdKey.bin");
+    ProtectEngine *pe = new ProtectEngine(dialog, "status.sys");
     pe->protect();
 
     return app.exec();

@@ -23,7 +23,7 @@ void ProtectEngine::protect()
     if(!isValidLicense()) {
         QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");        
         m_LicenseFile->close();
-//        writeLastTimeRun();
+        writeLastTimeRun();
         throw "Renew license!";
     } else {
         m_LicenseFile->close();
