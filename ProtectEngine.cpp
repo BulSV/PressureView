@@ -19,9 +19,9 @@ ProtectEngine::~ProtectEngine()
 }
 
 void ProtectEngine::protect()
-{        
+{
     if(!isValidLicense()) {
-        QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");        
+        QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");
         m_LicenseFile->close();
         writeLastTimeRun();
         throw "Renew license!";
@@ -47,64 +47,43 @@ bool ProtectEngine::isValidLicense()
 #endif
         QDataStream stream(m_LicenseFile);
         stream.setVersion(QDataStream::Qt_5_2);
-        QDate date;
+        QDate startDate;
+        QDate endDate;
+        QDate lastDate;
 
-        stream >> date;
+        stream >> startDate;
 #ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "start: Ошибка чтения файла" << stream.status();
         }
 #endif
-        int startTimeDay = date.day();
-        int startTimeMonth = date.month();
-        int startTimeYear = date.year();
-
-        stream >> date;
+        stream >> endDate;
 #ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "end: Ошибка чтения файла" << stream.status();
         }
 #endif
-        int endTimeDay = date.day();
-        int endTimeMonth = date.month();
-        int endTimeYear = date.year();
-
-        stream >> date;
+        stream >> lastDate;
 #ifdef DEBUG
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "last: Ошибка чтения файла" << stream.status();
         }
 #endif
-        int lastTimeDay = date.day();
-        int lastTimeMonth = date.month();
-        int lastTimeYear = date.year();
 #ifdef DEBUG
         qDebug() << "READ: bool ProtectEngine::isValidLicense()";
         qDebug() << "Start Time:";
-        qDebug() << startTimeDay;
-        qDebug() << startTimeMonth;
-        qDebug() << startTimeYear;
+        qDebug() << startDate;
         qDebug() << "End Time:";
-        qDebug() << endTimeDay;
-        qDebug() << endTimeMonth;
-        qDebug() << endTimeYear;
+        qDebug() << endDate;
         qDebug() << "Last Time:";
-        qDebug() << lastTimeDay;
-        qDebug() << lastTimeMonth;
-        qDebug() << lastTimeYear;
+        qDebug() << lastDate;
 #endif
-        if(startTimeDay <= m_CurrentDate->day()
-                && startTimeMonth <= m_CurrentDate->month()
-                && startTimeYear <= m_CurrentDate->year()
-                && endTimeDay >= m_CurrentDate->day()
-                && endTimeMonth >= m_CurrentDate->month()
-                && endTimeYear >= m_CurrentDate->year()
-                && lastTimeDay <= m_CurrentDate->day()
-                && lastTimeMonth <= m_CurrentDate->month()
-                && lastTimeYear <= m_CurrentDate->year()) {
+        if(startDate <= *m_CurrentDate
+                && endDate >= *m_CurrentDate
+                && lastDate <= *m_CurrentDate) {
 #ifdef DEBUG
             qDebug() << "TRUE";
 #endif
