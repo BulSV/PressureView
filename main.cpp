@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 #endif
     Dialog *dialog = new Dialog();
     dialog->setWindowTitle(QString::fromUtf8("Pressure View"));
-    ProtectEngine *pe = new ProtectEngine(dialog, "status.sys");
+    ProtectEngine *pe = new ProtectEngine(dialog, "Qt5Start.dll");
     pe->protect();
 
     return app.exec();

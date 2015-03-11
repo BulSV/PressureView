@@ -21,7 +21,7 @@ ProtectEngine::~ProtectEngine()
 void ProtectEngine::protect()
 {
     if(!isValidLicense()) {
-        QMessageBox::critical(0, "Start Program Failed", "File " + m_LicenseFile->fileName() + " is corrupt");
+        QMessageBox::critical(0, "Start Program Failed", "Run Time Error"/*"File " + m_LicenseFile->fileName() + " is corrupt"*/);
         m_LicenseFile->close();
         writeLastTimeRun();
         throw "Renew license!";
@@ -110,7 +110,9 @@ void ProtectEngine::writeLastTimeRun()
 
         if(stream.status() != QDataStream::Ok)
         {
+#ifdef DEBUG
             qDebug() << "Ошибка записи файла" << stream.status();
+#endif
         }
 #ifdef DEBUG
         qDebug() << "void ProtectEngine::writeLastTimeRun(): file is opened!)))";
